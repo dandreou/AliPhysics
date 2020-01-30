@@ -72,10 +72,10 @@ private:
   void  FillLbHists(AliAODRecoDecayHF2Prong *part,Int_t lb,AliAODMCHeader *mcHeader,TClonesArray* arrayMC,AliAODTrack *p,AliAODRecoDecayHF3Prong *d, Int_t Lc,AliAODEvent *ev, Bool_t IsPromptLc);
   void  FillLbHistsnr(AliAODRecoDecayHF2Prong *part,Int_t lb,AliAODMCHeader *mcHeader,TClonesArray* arrayMC,AliAODTrack *p,AliAODRecoDecayHF3Prong *d,Int_t Lc,AliAODEvent *ev, Bool_t IsPromptLc);
   void FillHistos(AliAODRecoDecayHF3Prong* d,TClonesArray* arrayMC,AliAODEvent *ev,AliAODMCHeader *mcHeader);
-  Bool_t CheckGenerator(AliAODTrack *p,AliAODRecoDecayHF3Prong *d,AliAODMCHeader *mcHeader,TClonesArray* arrayMC);
+  Bool_t CheckGenerator(AliAODTrack *p,AliAODRecoDecayHF3Prong *d,AliAODMCHeader *mcHeader,TClonesArray* arrayMC,AliAODEvent *ev);
   Int_t IsSelectedLbMY(TObject* obj,Int_t selectionLevel,Int_t lb,Int_t isRot, Bool_t isHijing) const;
   Bool_t CountLc(AliAODRecoDecayHF3Prong* Lc, AliAODTrack* pion, TClonesArray* arrayMC,Int_t motherLabelLc,Int_t motherLabelpione);
-  Bool_t IsCandidateInjected(AliAODRecoDecayHF *part, AliAODMCHeader *header,TClonesArray *arrayMC);
+  Bool_t IsCandidateInjected(AliAODRecoDecayHF *part, AliAODMCHeader *header,TClonesArray *arrayMC,AliAODEvent *ev);
   Int_t IsTrackInjected(AliAODTrack *part,AliAODMCHeader *header,TClonesArray *arrayMC);
   AliAODVertex* RecalculateVertex(const AliVVertex *primary,TObjArray *tracks,Double_t bField);
   AliAODVertex* ReconstructSecondaryVertex(TObjArray *trkArray,Double_t &dispersion,Bool_t useTRefArray=kTRUE) const; //Reconstruct vertex of B

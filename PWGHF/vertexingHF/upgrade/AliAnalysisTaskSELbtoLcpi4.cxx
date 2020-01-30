@@ -401,7 +401,7 @@ void AliAnalysisTaskSELbtoLcpi4::FillHistos(AliAODRecoDecayHF3Prong* d,TClonesAr
       lc=1;
     }
 
-    Bool_t isHijing = CheckGenerator(HPiAODtrk,d,mcHeader,arrayMC);
+    Bool_t isHijing = CheckGenerator(HPiAODtrk,d,mcHeader,arrayMC,ev);
     // JJJ - check whether bkg from hijing
     if(lb==0 && !isHijing){
       HPiAODtrk=0;
@@ -520,7 +520,7 @@ void AliAnalysisTaskSELbtoLcpi4::FillLbHists(AliAODRecoDecayHF2Prong *part,Int_t
 
   Int_t promptLc=0;
   if (IsPromptLc) promptLc=1;
-  Bool_t gen = CheckGenerator(pion,d,mcHeader,arrayMC);
+  Bool_t gen = CheckGenerator(pion,d,mcHeader,arrayMC,ev);
 
   Double_t massTrueLB = 5.641;
   UInt_t pdgLb[2]={211,4122};
@@ -728,8 +728,8 @@ Int_t AliAnalysisTaskSELbtoLcpi4::CheckMCLc(AliAODRecoDecayHF3Prong *d,TClonesAr
   return 999;
 }
 //----------------------------------------------------------------
-Bool_t AliAnalysisTaskSELbtoLcpi4::CheckGenerator(AliAODTrack *p, AliAODRecoDecayHF3Prong *d, AliAODMCHeader *mcHeader,TClonesArray* arrayMC){
-  Bool_t LcNotHijing=IsCandidateInjected(d, mcHeader,arrayMC);
+Bool_t AliAnalysisTaskSELbtoLcpi4::CheckGenerator(AliAODTrack *p, AliAODRecoDecayHF3Prong *d, AliAODMCHeader *mcHeader,TClonesArray* arrayMC, AliAODEvent *aod){
+  Bool_t LcNotHijing=IsCandidateInjected(d, mcHeader,arrayMC,aod);
   Bool_t pionNotHijing=IsTrackInjected(p,mcHeader,arrayMC);
   if(!LcNotHijing && !pionNotHijing) return kTRUE;
   else return kFALSE;
@@ -1002,7 +1002,7 @@ void AliAnalysisTaskSELbtoLcpi4::FillLbHistsnr(AliAODRecoDecayHF2Prong *part,Int
 
   Int_t promptLc=0;
   if (IsPromptLc) promptLc=1;
-  Bool_t gen = CheckGenerator(pion,d,mcHeader,arrayMC);
+  Bool_t gen = CheckGenerator(pion,d,mcHeader,arrayMC,ev);
 
   Double_t massTrueLB = 5.641;
   UInt_t pdgLb[2]={211,4122};
@@ -1100,16 +1100,23 @@ Int_t AliAnalysisTaskSELbtoLcpi4::IsTrackInjected(AliAODTrack *part,AliAODMCHead
 }
 
 //_____________________________________________________________
-Bool_t AliAnalysisTaskSELbtoLcpi4::IsCandidateInjected(AliAODRecoDecayHF *part, AliAODMCHeader *header,TClonesArray *arrayMC){
+Bool_t AliAnalysisTaskSELbtoLcpi4::IsCandidateInjected(AliAODRecoDecayHF *part, AliAODMCHeader *header,TClonesArray *arrayMC, AliAODEvent *aod){
 
   Int_t nprongs=part->GetNProngs();
   for(Int_t i=0;i<nprongs;i++){
-    AliAODTrack *daugh=(AliAODTrack*)part->GetDaughter(i);
-    Int_t lab=-999.;
-    if(fApplyFixesITS3AnalysisHijing)lab=TMath::Abs(daugh->GetLabel());
-    else                             lab=daugh->GetLabel();
-    if(lab<0) return 0;
-    if(IsTrackInjected(daugh,header,arrayMC)) return kTRUE;
+     AliAODTrack *daughter=(AliAODTrack*)part->GetDaughter(i);
+     Int_t lab=-999.;
+     if(fApplyFixesITS3AnalysisHijing)lab=TMath::Abs(daughter->GetLabel());
+     else                             lab=daughter->GetLabel();
+     if(lab<0) return 0;
+     //if(IsTrackInjected(daugh,header,arrayMC)) return kTRUE;
+     Int_t idDau=part->GetProngID(i);
+     for(Int_t i=0; i<aod->GetNumberOfTracks(); i++) {
+        AliAODTrack *daugh=(AliAODTrack*)aod->GetTrack(i);
+        if(daugh && (Int_t)daugh->GetID()==idDau){
+         if(AliVertexingHFUtils::IsTrackInjected(daugh,header,arrayMC)) return kTRUE;
+        }
+     }
   }
   return kFALSE;
 }
